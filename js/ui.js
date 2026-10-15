@@ -917,15 +917,39 @@
       // Export JSON
       document.getElementById('btn-export-json')?.addEventListener('click', () => {
         if (this.sound) this.sound.playClick();
-        const jsonStr = this.storage.exportJSON();
-        this.downloadFile(jsonStr, `mindsprint-backup-${Date.now()}.json`, 'application/json');
+        try {
+          const jsonStr = this.storage.exportJSON();
+          const sessions = this.storage.getSessions();
+          if (!sessions || sessions.length === 0) {
+            this.showToast('No session data to export yet. Complete a training round first!', 'warn');
+            return;
+          }
+          const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+          this.downloadFile(jsonStr, `mindsprint-backup-${ts}.json`, 'application/json');
+          this.showToast('✓ JSON backup downloaded successfully!', 'success');
+        } catch (err) {
+          this.showToast('Export failed — please try again.', 'error');
+          console.error('[MindSprint] JSON export error:', err);
+        }
       });
 
       // Export CSV
       document.getElementById('btn-export-csv')?.addEventListener('click', () => {
         if (this.sound) this.sound.playClick();
-        const csvStr = this.storage.exportCSV();
-        this.downloadFile(csvStr, `mindsprint-history-${Date.now()}.csv`, 'text/csv');
+        try {
+          const sessions = this.storage.getSessions();
+          if (!sessions || sessions.length === 0) {
+            this.showToast('No session history to export yet. Complete a training round first!', 'warn');
+            return;
+          }
+          const csvStr = this.storage.exportCSV();
+          const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+          this.downloadFile(csvStr, `mindsprint-history-${ts}.csv`, 'text/csv;charset=utf-8;');
+          this.showToast(`✓ CSV exported — ${sessions.length} session${sessions.length !== 1 ? 's' : ''} saved!`, 'success');
+        } catch (err) {
+          this.showToast('Export failed — please try again.', 'error');
+          console.error('[MindSprint] CSV export error:', err);
+        }
       });
 
       // Import Backup
@@ -945,15 +969,20 @@
           if (typeof content === 'string') {
             const res = this.storage.importJSON(content);
             if (res.success) {
-              alert('Backup imported successfully!');
+              this.showToast('✓ Backup imported successfully! Your data has been restored.', 'success');
               this.applySavedSettings();
               this.refreshHomeStats();
             } else {
-              alert(`Import failed: ${res.error}`);
+              this.showToast(`Import failed: ${res.error}`, 'error');
             }
           }
         };
+        reader.onerror = () => {
+          this.showToast('Could not read file. Please select a valid MindSprint JSON backup.', 'error');
+        };
         reader.readAsText(file);
+        // Reset so the same file can be re-selected if needed
+        e.target.value = '';
       });
 
       // Reset Stats
@@ -991,10 +1020,72 @@
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
+      a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Defer revocation so the browser has time to initiate the download
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
+
+    showToast(message, type = 'success') {
+      // Remove any existing toast
+      const existing = document.getElementById('ms-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'ms-toast';
+      toast.setAttribute('role', 'status');
+      toast.setAttribute('aria-live', 'polite');
+
+      const colors = {
+        success: { bg: '#A8F05F', border: '#2d7a00', text: '#111' },
+        warn:    { bg: '#FFE66D', border: '#a07800', text: '#111' },
+        error:   { bg: '#FF6B6B', border: '#8b0000', text: '#fff' }
+      };
+      const c = colors[type] || colors.success;
+
+      Object.assign(toast.style, {
+        position: 'fixed',
+        bottom: '28px',
+        left: '50%',
+        transform: 'translateX(-50%) translateY(20px)',
+        background: c.bg,
+        color: c.text,
+        border: `3px solid ${c.border}`,
+        boxShadow: `4px 4px 0 ${c.border}`,
+        borderRadius: '8px',
+        padding: '12px 22px',
+        fontWeight: '800',
+        fontSize: '0.95rem',
+        fontFamily: 'var(--font-main)',
+        textTransform: 'uppercase',
+        letterSpacing: '0.02em',
+        zIndex: '9999',
+        maxWidth: 'calc(100vw - 40px)',
+        textAlign: 'center',
+        transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease',
+        opacity: '0',
+        pointerEvents: 'none',
+        whiteSpace: 'pre-line'
+      });
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      // Animate in
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          toast.style.opacity = '1';
+          toast.style.transform = 'translateX(-50%) translateY(0)';
+        });
+      });
+
+      // Auto-dismiss after 3.5 seconds
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(16px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
     }
 
     // =========================================================================
