@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindSprint — Automated Test Suite</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .test-suite-container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .test-header-card {
+      background: var(--accent-yellow);
+      color: var(--text-dark);
+      border: var(--border-width) solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .test-summary-pill {
+      background: var(--surface-dark);
+      color: #fff;
+      padding: 8px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-btn);
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+    .test-section {
+      background: var(--surface);
+      color: var(--text-dark);
+      border: var(--border-width) solid var(--border-color);
+      box-shadow: var(--shadow-md);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .test-section-title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+    .test-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-btn);
+      background: #fff;
+      font-weight: 800;
+      font-size: 0.92rem;
+      gap: 12px;
+    }
+    .test-badge-pass {
+      background: var(--accent-lime);
+      color: var(--text-dark);
+      padding: 4px 10px;
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      font-weight: 900;
+      font-size: 0.78rem;
+    }
+    .test-badge-fail {
+      background: var(--error);
+      color: #fff;
+      padding: 4px 10px;
+      border: 2px solid var(--border-color);
+      border-radius: 4px;
+      font-weight: 900;
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body data-accent="yellow">
+  <div class="test-suite-container">
+    <div class="test-header-card">
+      <div>
+        <h1 style="font-size: 1.8rem; font-weight: 900; text-transform: uppercase;">MINDSPRINT TEST RUNNER</h1>
+        <p style="font-weight: 700; margin-top: 4px;">Automated browser verification suite for core mechanics &amp; resilience</p>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <div class="test-summary-pill" id="test-summary">RUNNING...</div>
+        <button type="button" class="btn btn-dark" id="btn-rerun">RE-RUN TESTS</button>
+        <a href="../index.html" class="btn btn-secondary">&larr; BACK TO APP</a>
+      </div>
+    </div>
+
+    <div id="test-results-container" style="display: flex; flex-direction: column; gap: 16px;"></div>
+  </div>
+
+  <!-- Dependencies -->
+  <script src="../js/storage.js"></script>
+  <script src="../js/sound.js"></script>
+  <script src="../js/generators.js"></script>
+  <script src="../js/engine.js"></script>
+
+  <script>
+    const G = window.MindSprintGenerators;
+    const S = window.MindSprintStorage;
+    const E = window.MindSprintEngine;
+
+    function runAllBrowserTests() {
+      const container = document.getElementById('test-results-container');
+      container.innerHTML = '';
+
+      let totalPassed = 0;
+      let totalFailed = 0;
+
+      function assert(condition, message) {
+        if (!condition) throw new Error(message || 'Assertion failed');
+      }
+
+      function assertEqual(actual, expected, message) {
+        if (actual !== expected) throw new Error(`${message || 'Assertion failed'} (Expected ${expected}, got ${actual})`);
+      }
+
+      const suites = [
+        {
+          name: '1. Arithmetic & Quick Math',
+          tests: [
+            {
+              desc: 'Addition produces safe integers and exactly 4 choices with 1 correct',
+              fn: () => {
+                for (let i = 0; i < 30; i++) {
+                  const q = G.QuickMath.generate('medium', ['add']);
+                  assert(Number.isInteger(q.correctAnswer));
+                  assert(q.expression.includes('+'));
+                  assertEqual(q.choices.length, 4);
+                  const correct = q.choices.filter(c => c.value === q.correctAnswer);
+                  assertEqual(correct.length, 1);
+                }
+              }
+            },
+            {
+              desc: 'Subtraction guarantees non-negative answers',
+              fn: () => {
+                for (let i = 0; i < 30; i++) {
+                  const q = G.QuickMath.generate('hard', ['sub']);
+                  assert(q.correctAnswer >= 0);
+                  assert(q.expression.includes('−'));
+                }
+              }
+            },
+            {
+              desc: 'Division produces exact integer quotients with no remainder',
+              fn: () => {
+                for (let i = 0; i < 30; i++) {
+                  const q = G.QuickMath.generate('medium', ['div']);
+                  assert(Number.isInteger(q.correctAnswer));
+                  assert(!q.expression.includes('÷ 0'));
+                }
+              }
+            },
+            {
+              desc: 'Distractor generator creates 4 strictly unique choices',
+              fn: () => {
+                for (let i = 0; i < 30; i++) {
+                  const ans = 42;
+                  const c = G.generateDistractors(ans, 3);
+                  assertEqual(c.length, 4);
+                  assertEqual(new Set(c).size, 4);
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: '2. Advanced Calculations (No eval)',
+          tests: [
+            {
+              desc: 'AST Evaluator respects operator precedence and parentheses',
+              fn: () => {
+                // 4 + 6 * 2 = 16
+                const ast1 = { op: '+', left: 4, right: { op: '*', left: 6, right: 2 } };
+                assertEqual(G.AdvancedMath.evaluateAST(ast1), 16);
+                // (4 + 6) * 2 = 20
+                const ast2 = { op: '*', left: { op: '+', left: 4, right: 6 }, right: 2 };
+                assertEqual(G.AdvancedMath.evaluateAST(ast2), 20);
+              }
+            },
+            {
+              desc: 'Generates valid multi-step expressions without eval()',
+              fn: () => {
+                for (let i = 0; i < 20; i++) {
+                  const q = G.AdvancedMath.generate('medium');
+                  assert(Number.isSafeInteger(q.correctAnswer));
+                  assertEqual(q.choices.length, 4);
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: '3. Number Sequences',
+          tests: [
+            {
+              desc: 'Generates valid sequence with non-empty rule explanation',
+              fn: () => {
+                for (let i = 0; i < 20; i++) {
+                  const q = G.NumberSequences.generate('medium');
+                  assert(q.expression.includes(', ?'));
+                  assert(q.explanation.length > 5);
+                  assertEqual(q.choices.length, 4);
+                }
+              }
+            }
+          ]
+        },
+        {
+          name: '4. Comparisons',
+          tests: [
+            {
+              desc: 'Generates valid balance of >, <, and = cases',
+              fn: () => {
+                const seen = new Set();
+                for (let i = 0; i < 50; i++) {
+                  const q = G.Comparison.generate('medium');
+                  assert(['>', '<', '='].includes(q.correctAnswer));
+                  seen.add(q.correctAnswer);
+                }
+                assertEqual(seen.size, 3, 'Must see >, <, and =');
+              }
+            }
+          ]
+        },
+        {
+          name: '5. Squares & Math Puzzles',
+          tests: [
+            {
+              desc: 'Squares generator calculates correct base squares',
+              fn: () => {
+                for (let i = 0; i < 20; i++) {
+                  const q = G.Squares.generate('medium');
+                  assert(q.correctAnswer > 0);
+                  assertEqual(q.choices.length, 4);
+                }
+              }
+            },
+            {
+              desc: 'Math Puzzles generates verified 2x2 grid matrix',
+              fn: () => {
+                const q = G.MathPuzzles.generate('medium');
+                assert(q.isPuzzle);
+                assertEqual(q.puzzleData.raw.a + q.puzzleData.raw.b, q.puzzleData.raw.r1);
+              }
+            }
+          ]
+        },
+        {
+          name: '6. Game Engine & Scoring',
+          tests: [
+            {
+              desc: 'Scoring formula awards base + speed + streak points',
+              fn: () => {
+                const eng = new E.GameEngine({ storage: S, sound: null, generators: G });
+                eng.startSession({ roundLength: 5, timeLimitSec: 15 });
+                eng.submitAnswer(eng.currentQuestion.correctAnswer);
+                assert(eng.score >= 100);
+                assertEqual(eng.correctCount, 1);
+                eng.cleanupTimers();
+              }
+            },
+            {
+              desc: 'Prevents double answer submissions in FEEDBACK state',
+              fn: () => {
+                const eng = new E.GameEngine({ storage: S, sound: null, generators: G });
+                eng.startSession({ roundLength: 5, timeLimitSec: 15 });
+                const ans = eng.currentQuestion.correctAnswer;
+                eng.submitAnswer(ans);
+                const score1 = eng.score;
+                eng.submitAnswer(ans);
+                assertEqual(eng.score, score1);
+                eng.cleanupTimers();
+              }
+            },
+            {
+              desc: 'Timeout records mistake and zeroes points',
+              fn: () => {
+                const eng = new E.GameEngine({ storage: S, sound: null, generators: G });
+                eng.startSession({ roundLength: 5, timeLimitSec: 15 });
+                eng.handleTimeout();
+                assertEqual(eng.timeoutCount, 1);
+                assertEqual(eng.score, 0);
+                assertEqual(eng.mistakes.length, 1);
+                eng.cleanupTimers();
+              }
+            },
+            {
+              desc: 'Time limit decreases gradually after each successful calculation',
+              fn: () => {
+                const eng = new E.GameEngine({ storage: S, sound: null, generators: G });
+                eng.startSession({ roundLength: 10, timeLimitSec: 15 });
+                assertEqual(eng.timeLimitSec, 15);
+                eng.submitAnswer(eng.currentQuestion.correctAnswer);
+                eng.nextQuestion();
+                assert(eng.timeLimitSec < 15);
+                assertEqual(eng.timeLimitSec, 14.6);
+                eng.cleanupTimers();
+              }
+            },
+            {
+              desc: 'One wrong input ends run and preserves points & questions solved',
+              fn: () => {
+                S.clearAllData();
+                const eng = new E.GameEngine({ storage: S, sound: null, generators: G });
+                eng.startSession({ roundLength: 10, timeLimitSec: 15 });
+                eng.submitAnswer(eng.currentQuestion.correctAnswer);
+                const earned = eng.score;
+                assert(earned >= 100);
+                const wrong = eng.currentQuestion.choices.find(c => c.value !== eng.currentQuestion.correctAnswer).value;
+                eng.submitAnswer(wrong);
+                assertEqual(eng.score, earned);
+                eng.finishSession();
+                const sess = S.getSessions();
+                assertEqual(sess[0].score, earned);
+                assertEqual(sess[0].correctCount, 1);
+                eng.cleanupTimers();
+              }
+            }
+          ]
+        },
+        {
+          name: '7. Storage & Streak Calculation',
+          tests: [
+            {
+              desc: 'Consecutive day streak increases strictly by calendar days',
+              fn: () => {
+                S.clearAllData();
+                S.updateDayStreak('2026-10-15');
+                assertEqual(S.getStatistics().dayStreak, 1);
+                S.updateDayStreak('2026-10-15'); // same day repeat
+                assertEqual(S.getStatistics().dayStreak, 1);
+                S.updateDayStreak('2026-10-16'); // consecutive day
+                assertEqual(S.getStatistics().dayStreak, 2);
+              }
+            },
+            {
+              desc: 'Corrupted JSON imports are safely rejected',
+              fn: () => {
+                const res = S.importJSON('{"corrupt": invalid');
+                assertEqual(res.success, false);
+                const resArr = S.importJSON('["not", "object"]');
+                assertEqual(resArr.success, false);
+              }
+            },
+            {
+              desc: 'Export JSON and Import JSON round-trip retains integrity',
+              fn: () => {
+                S.clearAllData();
+                S.recordSession({
+                  gameMode: 'quickMath',
+                  difficulty: 'easy',
+                  score: 520,
+                  totalQuestions: 5,
+                  correctCount: 5,
+                  incorrectCount: 0,
+                  timeoutCount: 0,
+                  longestStreak: 5,
+                  avgResponseTimeMs: 1400
+                });
+                const exportStr = S.exportJSON();
+                const importRes = S.importJSON(exportStr);
+                assertEqual(importRes.success, true);
+                assertEqual(S.getStatistics().bestScore, 520);
+              }
+            }
+          ]
+        }
+      ];
+
+      suites.forEach((suite) => {
+        const sec = document.createElement('div');
+        sec.className = 'test-section';
+
+        const title = document.createElement('div');
+        title.className = 'test-section-title';
+        title.textContent = suite.name;
+        sec.appendChild(title);
+
+        suite.tests.forEach((t) => {
+          const row = document.createElement('div');
+          row.className = 'test-row';
+
+          let passed = false;
+          let errMsg = '';
+          try {
+            t.fn();
+            passed = true;
+            totalPassed++;
+          } catch (e) {
+            passed = false;
+            errMsg = e.message;
+            totalFailed++;
+          }
+
+          row.innerHTML = `
+            <span>${t.desc}</span>
+            <span class="${passed ? 'test-badge-pass' : 'test-badge-fail'}">
+              ${passed ? 'PASS' : 'FAIL: ' + errMsg}
+            </span>
+          `;
+          sec.appendChild(row);
+        });
+
+        container.appendChild(sec);
+      });
+
+      const summary = document.getElementById('test-summary');
+      if (summary) {
+        summary.textContent = `${totalPassed} PASSED / ${totalFailed} FAILED`;
+        summary.style.background = totalFailed === 0 ? 'var(--accent-lime)' : 'var(--error)';
+        summary.style.color = '#111';
+      }
+    }
+
+    document.getElementById('btn-rerun')?.addEventListener('click', runAllBrowserTests);
+    document.addEventListener('DOMContentLoaded', runAllBrowserTests);
+  </script>
+</body>
+</html>

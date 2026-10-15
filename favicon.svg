@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Hard offset shadow -->
+  <rect x="8" y="8" width="52" height="52" rx="10" fill="#050505" />
+  <!-- Main card -->
+  <rect x="4" y="4" width="52" height="52" rx="10" fill="#FFE66D" stroke="#050505" stroke-width="4" stroke-linejoin="round" />
+  <!-- Bold mathematical Sigma + Lightning symbol -->
+  <path d="M 18 16 L 42 16 L 28 32 L 42 48 L 18 48 L 18 42 L 32 42 L 22 32 L 32 22 L 18 22 Z" fill="#050505" />
+  <!-- Small neon accent dot -->
+  <circle cx="43" cy="20" r="3" fill="#FF77B7" stroke="#050505" stroke-width="1.5" />
+</svg>

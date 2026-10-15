@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="MindSprint — Complete Ad-Free Mental Calculation Web App with Dark Neo-Brutalism UI. Train your brain. Own your progress.">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="MindSprint">
+
+  <title>MindSprint — Train Your Brain. Own Your Progress.</title>
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-accent="yellow" data-density="normal">
+  <!-- Accessibility Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div class="app-container">
+    <!-- SITE HEADER -->
+    <header class="site-header" role="banner">
+      <button type="button" class="logo-group" id="btn-nav-home" aria-label="MindSprint Home">
+        <div class="logo-badge" aria-hidden="true">&Sigma;</div>
+        <div class="brand-text">
+          <span class="brand-title">MINDSPRINT</span>
+          <span class="brand-tagline">Train Your Brain. Own Your Progress.</span>
+        </div>
+      </button>
+
+      <nav class="header-actions" aria-label="Main Navigation">
+        <button type="button" class="btn btn-dark btn-icon-only" id="btn-nav-stats" aria-label="Statistics Dashboard" title="Statistics">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+        </button>
+        <button type="button" class="btn btn-dark btn-icon-only" id="btn-nav-history" aria-label="Practice History" title="History">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </button>
+        <button type="button" class="btn btn-dark btn-icon-only" id="btn-nav-settings" aria-label="Settings" title="Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <!-- MAIN APP SCREENS CONTAINER -->
+    <main id="main-content" role="main">
+
+      <!-- ================================================================== -->
+      <!-- SCREEN 1: HOME SCREEN -->
+      <!-- ================================================================== -->
+      <section id="screen-home" class="screen active" aria-labelledby="hero-title">
+        <!-- Hero Section -->
+        <div class="hero-section">
+          <span class="hero-pill">YOUR DAILY BRAIN WORKOUT</span>
+          <h1 id="hero-title" class="hero-heading">
+            MAKE YOUR MIND<br>
+            <span class="hero-highlight">LIGHTNING FAST.</span>
+          </h1>
+          <p class="hero-subtitle">No ads. No distractions. Just you versus the numbers.</p>
+        </div>
+
+        <!-- Real Statistics Strip -->
+        <div class="stats-strip" aria-label="Quick Performance Summary">
+          <div class="stat-card stat-card-yellow">
+            <span class="stat-label">BEST SCORE</span>
+            <span class="stat-value" id="home-stat-best">0</span>
+          </div>
+          <div class="stat-card stat-card-lime">
+            <span class="stat-label">QUESTIONS SOLVED</span>
+            <span class="stat-value" id="home-stat-solved">0</span>
+          </div>
+          <div class="stat-card stat-card-cyan">
+            <span class="stat-label">DAY STREAK</span>
+            <span class="stat-value" id="home-stat-streak">0</span>
+          </div>
+        </div>
+
+        <!-- Training Mode Grid -->
+        <div class="section-header">
+          <h2 class="section-title">
+            PICK YOUR CHALLENGE
+            <span class="section-badge">7 MODES</span>
+          </h2>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-home-rules" style="font-size: 0.8rem; padding: 6px 12px;">Rules & Shortcuts</button>
+        </div>
+
+        <div class="game-grid">
+          <!-- 1. Quick Math -->
+          <article class="game-card" data-mode="quickMath" tabindex="0" role="button" aria-label="Play Quick Math">
+            <div class="game-card-header">
+              <div class="game-icon-box" aria-hidden="true">&plusmn;</div>
+              <span class="game-card-title">QUICK MATH</span>
+            </div>
+            <p class="game-card-desc">Rapid-fire fundamental operations: addition, subtraction, multiplication, and exact division.</p>
+            <div class="game-card-footer">
+              <span>Standard Arithmetic</span>
+              <span>&rarr;</span>
+            </div>
+          </article>
+
+          <!-- 2. Advanced -->
+          <article class="game-card" data-mode="advanced" tabindex="0" role="button" aria-label="Play Advanced Calculations">
+            <div class="game-card-header">
+              <div class="game-icon-box" aria-hidden="true">&fnof;(x)</div>
+              <span class="game-card-title">ADVANCED</span>
+            </div>
+            <p class="game-card-desc">Multi-step mathematical expressions with nested parentheses and operator precedence.</p>
+            <div class="game-card-footer">
+              <span>Order of Operations</span>
+              <span>&rarr;</span>
+            </div>
+          </article>
+
+          <!-- 3. Number Sequences -->
+          <article class="game-card" data-mode="sequences" tabindex="0" role="button" aria-label="Play Number Sequences">
+            <div class="game-card-header">
+              <div class="game-icon-box" aria-hidden="true">&hellip;&rarr;</div>
+              <span class="game-card-title">SEQUENCES</span>
+            </div>
+            <p class="game-card-desc">Identify underlying numerical patterns, progressive steps, ratios, and alternating series.</p>
+            <div class="game-card-footer">
+              <span>Pattern Recognition</span>
+              <span>&rarr;</span>
+            </div>
+          </article>
+
+          <!-- 4. Compare -->
+          <article class="game-card" data-mode="compare" tabindex="0" role="button" aria-label="Play Compare Expressions">
+            <div class="game-card-header">
+              <div class="game-icon-box" aria-hidden="true">&lt;&equals;&gt;</div>
+              <span class="game-card-title">COMPARE</span>
+            </div>
+            <p class="game-card-desc">Quickly evaluate two distinct expressions and determine whether greater, less, or equal.</p>
+            <div class="game-card-footer">
+              <span>Numerical Estimation</span>
+              <span>&rarr;</span>
+            </div>
+          </article>
+
+          <!-- 5. Squares -->
+          <article class="game-card" data-mode="squares" tabindex="0" role="button" aria-label="Play Squares and Cubes">
+            <div class="game-card-header">
+              <div class="game-icon-box" aria-hidden="true">x&sup2;</div>
+              <span class="game-card-title">SQUARES</span>
+            </div>
+            <p class="game-card-desc">Master square numbers, base powers, and cube calculations for instant mental recall.</p>
+            <div class="game-card-footer">
+              <span>Powers & Squares</span>
+              <span>&rarr;</span>
+            </div>
+          </article>
+
+          <!-- 6. Math Puzzles -->
+          <article class="game-card" data-mode="puzzles" tabindex="0" role="button" aria-label="Play Math Puzzles">
+            <div class="game-card-header">
+              <div class="game-icon-box" aria-hidden="true">&#9638;</div>
+              <span class="game-card-title">MATH PUZZLES</span>
+            </div>
+            <p class="game-card-desc">Structured 2&times;2 grid matrix equations. Solve simultaneous row and column equations.</p>
+            <div class="game-card-footer">
+              <span>Matrix Arithmetic</span>
+              <span>&rarr;</span>
+            </div>
+          </article>
+
+          <!-- 7. Mixed Sprint -->
+          <article class="game-card" data-mode="mixed" tabindex="0" role="button" aria-label="Play Mixed Sprint">
+            <div class="game-card-header">
+              <div class="game-icon-box" aria-hidden="true">&#9889;</div>
+              <span class="game-card-title">MIXED SPRINT</span>
+            </div>
+            <p class="game-card-desc">The ultimate cognitive workout. Randomly balanced gauntlet across all 6 mathematical categories.</p>
+            <div class="game-card-footer">
+              <span>Dynamic Gauntlet</span>
+              <span>&rarr;</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SCREEN 2: GAME CONFIGURATION -->
+      <!-- ================================================================== -->
+      <section id="screen-config" class="screen" aria-labelledby="config-title">
+        <div class="config-container">
+          <div class="config-card">
+            <div class="config-header">
+              <div class="config-title-group">
+                <span class="config-subtitle">CONFIGURATION</span>
+                <h1 id="config-title" class="config-game-title">QUICK MATH</h1>
+              </div>
+              <button type="button" class="btn btn-dark" id="btn-config-back">&larr; BACK</button>
+            </div>
+
+            <!-- Difficulty Selection -->
+            <div class="config-group">
+              <label class="config-label">
+                <span>DIFFICULTY LEVEL</span>
+                <span id="config-diff-badge" style="color: #666; font-size: 0.8rem;">MEDIUM</span>
+              </label>
+              <div class="diff-grid" role="radiogroup" aria-label="Difficulty Levels">
+                <div class="diff-card" data-diff="easy" tabindex="0" role="radio" aria-checked="false">
+                  <span class="diff-card-title">EASY</span>
+                  <span class="diff-card-range">Small numbers & basic facts</span>
+                </div>
+                <div class="diff-card selected" data-diff="medium" tabindex="0" role="radio" aria-checked="true">
+                  <span class="diff-card-title">MEDIUM</span>
+                  <span class="diff-card-range">Standard 2-digit calculations</span>
+                </div>
+                <div class="diff-card" data-diff="hard" tabindex="0" role="radio" aria-checked="false">
+                  <span class="diff-card-title">HARD</span>
+                  <span class="diff-card-range">Large numbers & compound steps</span>
+                </div>
+                <div class="diff-card" data-diff="expert" tabindex="0" role="radio" aria-checked="false">
+                  <span class="diff-card-title">EXPERT</span>
+                  <span class="diff-card-range">Advanced mental gymnastics</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Question Count -->
+            <div class="config-group">
+              <label class="config-label">
+                <span>RUN TARGET / QUESTIONS</span>
+                <span style="font-size: 0.76rem; color: #555; font-weight: 800;">1 WRONG INPUT ENDS RUN</span>
+              </label>
+              <div class="options-row" id="group-round-length">
+                <div class="option-pill" data-val="5">5</div>
+                <div class="option-pill selected" data-val="10">10</div>
+                <div class="option-pill" data-val="20">20</div>
+                <div class="option-pill" data-val="50">50</div>
+                <div class="option-pill" data-val="0">&infin; Endless</div>
+              </div>
+            </div>
+
+            <!-- Time Limit -->
+            <div class="config-group">
+              <label class="config-label">TIME PER QUESTION</label>
+              <div class="options-row" id="group-time-limit">
+                <div class="option-pill" data-val="5">5s</div>
+                <div class="option-pill" data-val="10">10s</div>
+                <div class="option-pill selected" data-val="15">15s</div>
+                <div class="option-pill" data-val="30">30s</div>
+                <div class="option-pill" data-val="0">Untimed</div>
+              </div>
+            </div>
+
+            <!-- Quick Math Operators Filter (Conditional) -->
+            <div class="config-group" id="config-ops-group">
+              <label class="config-label">INCLUDED OPERATIONS</label>
+              <div class="ops-row">
+                <div class="op-toggle active" data-op="add">+ Addition</div>
+                <div class="op-toggle active" data-op="sub">&minus; Subtraction</div>
+                <div class="op-toggle active" data-op="mul">&times; Multiplication</div>
+                <div class="op-toggle active" data-op="div">&divide; Division</div>
+              </div>
+            </div>
+
+            <!-- Start Action -->
+            <button type="button" class="btn btn-primary btn-lg" id="btn-start-game">
+              START TRAINING &rarr;
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SCREEN 3: GAMEPLAY -->
+      <!-- ================================================================== -->
+      <section id="screen-gameplay" class="screen" aria-label="Game in Progress">
+        <div class="gameplay-wrapper">
+          <!-- Top Bar -->
+          <div class="gameplay-topbar">
+            <button type="button" class="btn btn-dark" id="btn-gameplay-exit">&larr; EXIT</button>
+            <div class="gameplay-title-badge" id="gameplay-mode-badge">QUICK MATH</div>
+            <button type="button" class="btn btn-dark btn-icon-only" id="btn-gameplay-sound" aria-label="Toggle Sound" title="Sound Toggle">
+              <span id="sound-icon-text">&#128266;</span>
+            </button>
+          </div>
+
+          <!-- Timer & Progress Bar -->
+          <div class="timer-container">
+            <div class="timer-box" id="timer-display-box">
+              <span id="timer-label">TIME REMAINING</span>
+              <span id="timer-text">15.0s</span>
+            </div>
+            <div class="progress-track" aria-hidden="true">
+              <div class="progress-fill" id="timer-progress-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+
+          <!-- Metadata Banner -->
+          <div class="meta-banner">
+            <div class="meta-item">
+              <div class="meta-item-label">QUESTION</div>
+              <div class="meta-item-value" id="game-meta-qnum">01 / 10</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-item-label">SCORE</div>
+              <div class="meta-item-value" id="game-meta-score">0</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-item-label">TIME PER Q</div>
+              <div class="meta-item-value" id="game-meta-streak">15.0s</div>
+            </div>
+          </div>
+
+          <!-- Question Display Card -->
+          <div class="question-card" id="gameplay-question-card">
+            <span class="category-tag" id="game-category-tag">QUICK MATH</span>
+            <div class="question-expression" id="game-expression-text">47 + 28 = ?</div>
+            <!-- Container for structured Math Puzzles -->
+            <div class="puzzle-grid-container" id="game-puzzle-container" style="display: none;"></div>
+          </div>
+
+          <!-- Answer Choices Grid -->
+          <div class="answers-grid" id="gameplay-answers-grid">
+            <button type="button" class="answer-btn" data-choice-idx="0">
+              <span class="key-badge">1</span>
+              <span class="ans-label">72</span>
+            </button>
+            <button type="button" class="answer-btn" data-choice-idx="1">
+              <span class="key-badge">2</span>
+              <span class="ans-label">75</span>
+            </button>
+            <button type="button" class="answer-btn" data-choice-idx="2">
+              <span class="key-badge">3</span>
+              <span class="ans-label">65</span>
+            </button>
+            <button type="button" class="answer-btn" data-choice-idx="3">
+              <span class="key-badge">4</span>
+              <span class="ans-label">85</span>
+            </button>
+          </div>
+
+          <!-- Feedback Toast Banner -->
+          <div class="feedback-banner" id="gameplay-feedback-banner" aria-live="assertive">
+            CORRECT! +145 POINTS
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SCREEN 4: RESULTS -->
+      <!-- ================================================================== -->
+      <section id="screen-results" class="screen" aria-labelledby="results-title">
+        <div class="results-container">
+          <div class="results-hero-card">
+            <span class="results-super-title" id="results-super-title">RUN FINISHED!</span>
+            <div class="results-score" id="results-score-value">0</div>
+            <span class="results-score-label">POINTS EARNED & SAVED</span>
+            <div class="hero-pill" id="results-solved-pill" style="margin-top: 10px; font-size: 1rem; background: var(--border-color); color: var(--accent-yellow); padding: 6px 16px;">0 QUESTIONS SOLVED</div>
+          </div>
+
+          <!-- Results Statistics Grid -->
+          <div class="results-grid">
+            <div class="result-stat-box">
+              <span class="result-stat-label">ACCURACY</span>
+              <div class="result-stat-val" id="results-accuracy">100%</div>
+            </div>
+            <div class="result-stat-box">
+              <span class="result-stat-label">CORRECT</span>
+              <div class="result-stat-val" style="color: #27ae60;" id="results-correct">10</div>
+            </div>
+            <div class="result-stat-box">
+              <span class="result-stat-label">MISTAKES</span>
+              <div class="result-stat-val" style="color: var(--error);" id="results-mistakes">0</div>
+            </div>
+            <div class="result-stat-box">
+              <span class="result-stat-label">TIMEOUTS</span>
+              <div class="result-stat-val" id="results-timeouts">0</div>
+            </div>
+            <div class="result-stat-box">
+              <span class="result-stat-label">AVG SPEED</span>
+              <div class="result-stat-val" id="results-speed">1.8s</div>
+            </div>
+            <div class="result-stat-box">
+              <span class="result-stat-label">BEST STREAK</span>
+              <div class="result-stat-val" id="results-streak">10</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="results-actions">
+            <button type="button" class="btn btn-primary btn-lg" id="btn-results-again">PLAY AGAIN</button>
+            <button type="button" class="btn btn-secondary btn-lg" id="btn-results-mistakes">REVIEW MISTAKES (<span id="results-mistake-count">0</span>)</button>
+            <button type="button" class="btn btn-dark btn-lg" id="btn-results-home">HOME</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SCREEN 5: STATISTICS DASHBOARD -->
+      <!-- ================================================================== -->
+      <section id="screen-stats" class="screen" aria-labelledby="stats-title">
+        <div class="stats-container">
+          <div class="section-header">
+            <h1 id="stats-title" class="section-title">PERFORMANCE METRICS</h1>
+            <button type="button" class="btn btn-dark" id="btn-stats-back">&larr; BACK</button>
+          </div>
+
+          <!-- Summary Cards Strip -->
+          <div class="stats-strip">
+            <div class="stat-card stat-card-yellow">
+              <span class="stat-label">TOTAL SESSIONS</span>
+              <span class="stat-value" id="stats-total-games">0</span>
+            </div>
+            <div class="stat-card stat-card-lime">
+              <span class="stat-label">OVERALL ACCURACY</span>
+              <span class="stat-value" id="stats-overall-acc">0%</span>
+            </div>
+            <div class="stat-card stat-card-cyan">
+              <span class="stat-label">AVG RESPONSE TIME</span>
+              <span class="stat-value" id="stats-avg-time">0.0s</span>
+            </div>
+          </div>
+
+          <!-- Category Breakdown -->
+          <div class="chart-card">
+            <div class="chart-title">
+              <span>ACCURACY BY CATEGORY</span>
+              <span style="font-size: 0.8rem; font-weight: 700; color: #666;">ALL-TIME ACCURACY</span>
+            </div>
+            <div class="category-bars" id="stats-category-bars">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Score Trend Sparkline Chart -->
+          <div class="chart-card">
+            <div class="chart-title">
+              <span>SCORE TRENDS (RECENT 10 SESSIONS)</span>
+              <span style="font-size: 0.8rem; font-weight: 700; color: #666;">POINTS</span>
+            </div>
+            <div class="trend-chart-box" id="stats-trend-container">
+              <!-- Rendered dynamically via SVG -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SCREEN 6: SESSION HISTORY -->
+      <!-- ================================================================== -->
+      <section id="screen-history" class="screen" aria-labelledby="history-title">
+        <div class="history-container">
+          <div class="section-header">
+            <h1 id="history-title" class="section-title">SESSION HISTORY</h1>
+            <button type="button" class="btn btn-dark" id="btn-history-back">&larr; BACK</button>
+          </div>
+
+          <!-- Filter & Sort Bar -->
+          <div class="filter-bar">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <select id="filter-game-mode" class="select-filter" aria-label="Filter by Game Mode">
+                <option value="all">All Game Modes</option>
+                <option value="quickMath">Quick Math</option>
+                <option value="advanced">Advanced</option>
+                <option value="sequences">Sequences</option>
+                <option value="compare">Compare</option>
+                <option value="squares">Squares</option>
+                <option value="puzzles">Math Puzzles</option>
+                <option value="mixed">Mixed Sprint</option>
+              </select>
+
+              <select id="filter-difficulty" class="select-filter" aria-label="Filter by Difficulty">
+                <option value="all">All Difficulties</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="expert">Expert</option>
+              </select>
+            </div>
+
+            <select id="sort-history" class="select-filter" aria-label="Sort History By">
+              <option value="date-desc">Newest First</option>
+              <option value="date-asc">Oldest First</option>
+              <option value="score-desc">Highest Score</option>
+            </select>
+          </div>
+
+          <!-- History Entries List -->
+          <div class="history-list" id="history-list-items">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SCREEN 7: SETTINGS -->
+      <!-- ================================================================== -->
+      <section id="screen-settings" class="screen" aria-labelledby="settings-title">
+        <div class="settings-container">
+          <div class="section-header">
+            <h1 id="settings-title" class="section-title">SETTINGS</h1>
+            <button type="button" class="btn btn-dark" id="btn-settings-back">&larr; BACK</button>
+          </div>
+
+          <!-- Gameplay Settings -->
+          <div class="settings-card">
+            <h2 class="settings-section-title">GAMEPLAY PREFERENCES</h2>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">DEFAULT DIFFICULTY</span>
+                <span class="setting-desc">Initial difficulty for new game rounds</span>
+              </div>
+              <select id="setting-default-diff" class="select-filter">
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+                <option value="expert">Expert</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">SOUND EFFECTS</span>
+                <span class="setting-desc">Tactile clicks, chimes, and audio feedback</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-sound" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">HAPTIC FEEDBACK</span>
+                <span class="setting-desc">Vibrate on taps and answer evaluations</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-haptics" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Appearance Settings -->
+          <div class="settings-card">
+            <h2 class="settings-section-title">APPEARANCE</h2>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">ACCENT COLOR</span>
+                <span class="setting-desc">Neo-Brutalist primary highlight tint</span>
+              </div>
+              <div class="swatch-group" id="theme-swatches">
+                <div class="color-swatch active" data-color="yellow" style="background: #FFE66D;" title="Electric Yellow"></div>
+                <div class="color-swatch" data-color="lime" style="background: #C6F55F;" title="Acid Lime"></div>
+                <div class="color-swatch" data-color="pink" style="background: #FF77B7;" title="Hot Pink"></div>
+                <div class="color-swatch" data-color="cyan" style="background: #70E5FF;" title="Hyper Cyan"></div>
+                <div class="color-swatch" data-color="purple" style="background: #B8A1FF;" title="Bright Purple"></div>
+                <div class="color-swatch" data-color="orange" style="background: #FF9B54;" title="Solar Orange"></div>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">REDUCED MOTION</span>
+                <span class="setting-desc">Disable transitions and active animations</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-reduced-motion">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Data & Backup Settings -->
+          <div class="settings-card">
+            <h2 class="settings-section-title">DATA MANAGEMENT</h2>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">EXPORT DATA</span>
+                <span class="setting-desc">Save your statistics, settings, and history as JSON or CSV</span>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-export-json">JSON</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-export-csv">CSV</button>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">IMPORT BACKUP</span>
+                <span class="setting-desc">Restore previously exported statistics and settings</span>
+              </div>
+              <div>
+                <input type="file" id="input-import-file" accept=".json" style="display: none;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-import-json">UPLOAD</button>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">RESET STATISTICS</span>
+                <span class="setting-desc">Reset all score records and question counts</span>
+              </div>
+              <button type="button" class="btn btn-dark btn-sm" id="btn-reset-stats">RESET</button>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-title">CLEAR ALL DATA</span>
+                <span class="setting-desc">Permanently wipe all local storage and history</span>
+              </div>
+              <button type="button" class="btn btn-dark btn-sm" style="border-color: var(--error); color: var(--error);" id="btn-clear-all">WIPE ALL</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================== -->
+      <!-- SCREEN 8: HELP & RULES -->
+      <!-- ================================================================== -->
+      <section id="screen-rules" class="screen" aria-labelledby="rules-heading">
+        <div class="config-container">
+          <div class="config-card">
+            <div class="config-header">
+              <h1 id="rules-heading" class="config-game-title">RULES &amp; SHORTCUTS</h1>
+              <button type="button" class="btn btn-dark" id="btn-rules-back">&larr; BACK</button>
+            </div>
+
+            <div class="config-group">
+              <h2 style="font-size: 1.15rem; font-weight: 900; text-transform: uppercase;">TRANSPARENT SCORING FORMULA</h2>
+              <p style="font-size: 0.95rem; line-height: 1.6;">
+                Every correct answer awards points using a formula designed to reward both precision and speed:
+              </p>
+              <div style="background: var(--surface-muted); padding: 14px; border: 2px solid var(--border-color); border-radius: 6px; font-family: var(--font-mono); font-size: 0.88rem; font-weight: 700;">
+                basePoints = 100<br>
+                speedBonus = round(50 &times; remainingTime / allowedTime)<br>
+                streakBonus = min(currentStreak &times; 5, 25)<br>
+                totalQuestionScore = basePoints + speedBonus + streakBonus
+              </div>
+              <p style="font-size: 0.88rem; color: #555;">
+                Incorrect answers and timeouts earn 0 points. No negative penalties are applied.
+              </p>
+            </div>
+
+            <div class="config-group">
+              <h2 style="font-size: 1.15rem; font-weight: 900; text-transform: uppercase;">KEYBOARD SHORTCUTS</h2>
+              <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-weight: 800;">
+                <li><span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">1</span> or <span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">A</span> : Select Choice 1 (or &gt; in Compare)</li>
+                <li><span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">2</span> or <span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">B</span> : Select Choice 2 (or = in Compare)</li>
+                <li><span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">3</span> or <span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">C</span> : Select Choice 3 (or &lt; in Compare)</li>
+                <li><span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">4</span> or <span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">D</span> : Select Choice 4</li>
+                <li><span style="background: var(--surface-dark); color: #fff; padding: 2px 8px; border-radius: 4px;">ESC</span> : Exit active session</li>
+              </ul>
+            </div>
+
+            <div class="config-group">
+              <h2 style="font-size: 1.15rem; font-weight: 900; text-transform: uppercase;">OFFLINE &amp; PWA INSTALLATION</h2>
+              <p style="font-size: 0.95rem; line-height: 1.5;">
+                MindSprint is an installable Progressive Web App with zero external dependencies. Once visited, it works 100% offline without internet connectivity. Tap "Add to Home Screen" on your mobile device or the install icon in your browser address bar.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="footer-stamp">NO ADS. NO TRACKERS. JUST PRACTICE.</div>
+      <nav class="footer-nav" aria-label="Footer Navigation">
+        <button type="button" class="footer-nav-link" id="link-footer-home">Home</button>
+        <button type="button" class="footer-nav-link" id="link-footer-stats">Stats</button>
+        <button type="button" class="footer-nav-link" id="link-footer-history">History</button>
+        <button type="button" class="footer-nav-link" id="link-footer-settings">Settings</button>
+        <button type="button" class="footer-nav-link" id="link-footer-rules">Rules</button>
+      </nav>
+      <div style="font-size: 0.72rem; color: var(--text-secondary); margin-top: 4px;">
+        MindSprint v1.0 &bull; Offline &bull; Ad-Free Mental Calculation
+      </div>
+    </footer>
+  </div>
+
+  <!-- ==================================================================== -->
+  <!-- MODALS -->
+  <!-- ==================================================================== -->
+
+  <!-- Confirm Exit Modal -->
+  <div class="modal-overlay" id="modal-confirm-exit" role="dialog" aria-modal="true" aria-labelledby="modal-exit-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modal-exit-title" class="modal-title">ABANDON SESSION?</h2>
+        <button type="button" class="btn btn-dark btn-icon-only btn-sm" id="btn-modal-exit-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-weight: 700; font-size: 1.05rem;">
+          Exiting mid-session will cancel your current progress. This session will not be saved as completed.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-modal-exit-resume">RESUME</button>
+        <button type="button" class="btn btn-dark" style="border-color: var(--error); color: var(--error);" id="btn-modal-exit-confirm">EXIT SESSION</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Mistakes Modal -->
+  <div class="modal-overlay" id="modal-review-mistakes" role="dialog" aria-modal="true" aria-labelledby="modal-mistakes-title">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h2 id="modal-mistakes-title" class="modal-title">REVIEW MISTAKES</h2>
+        <button type="button" class="btn btn-dark btn-icon-only btn-sm" id="btn-modal-mistakes-close">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-mistakes-body">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn-modal-mistakes-done">DONE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Action Generic Modal -->
+  <div class="modal-overlay" id="modal-confirm-action" role="dialog" aria-modal="true" aria-labelledby="modal-action-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="modal-action-title" class="modal-title">CONFIRM ACTION</h2>
+        <button type="button" class="btn btn-dark btn-icon-only btn-sm" id="btn-modal-action-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-action-message" style="font-weight: 700; font-size: 1.05rem;">
+          Are you sure you want to proceed with this destructive action?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-modal-action-cancel">CANCEL</button>
+        <button type="button" class="btn btn-dark" style="border-color: var(--error); color: var(--error);" id="btn-modal-action-proceed">CONFIRM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/generators.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

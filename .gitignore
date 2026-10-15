@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Production / Archives
+*.zip
+*.tar.gz
+*.rar
+dist/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# Operating System Files
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+
+# IDE / Editor Files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Temporary / Cache
+.cache/
+tmp/
+temp/
