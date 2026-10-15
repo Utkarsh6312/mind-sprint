@@ -55,10 +55,12 @@
     });
   }
 
-  // Handle PWA installation event (only when supported, no fake install button)
+  // Handle PWA installation prompt event
   window.addEventListener('beforeinstallprompt', (e) => {
-    // Store the event if needed for custom install prompt
+    // Prevent standard browser mini-infobar to use custom in-app buttons
+    e.preventDefault();
     window.deferredInstallPrompt = e;
     console.log('[MindSprint PWA] App is ready for installation.');
+    window.dispatchEvent(new CustomEvent('pwa-prompt-ready'));
   });
 })();

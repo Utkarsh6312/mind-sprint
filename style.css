@@ -1114,13 +1114,45 @@ body {
 
 .results-actions {
   display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 }
 
 .results-actions .btn {
-  flex: 1;
-  min-width: 160px;
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+  word-break: keep-all;
+  text-align: center;
+  font-size: 1.08rem;
+  padding: 14px 18px;
+  min-height: 52px;
+}
+
+@media (min-width: 641px) {
+  .results-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .results-actions .btn {
+    font-size: 1.15rem;
+    padding: 16px 24px;
+  }
+
+  .results-actions #btn-results-home {
+    grid-column: span 2;
+  }
+
+  .results-actions.no-mistakes {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .results-actions.no-mistakes #btn-results-home {
+    grid-column: auto;
+  }
 }
 
 /* ==========================================================================
@@ -1605,6 +1637,80 @@ input:checked + .slider::before {
 }
 
 /* ==========================================================================
+   PWA INSTALLATION COMPONENTS
+   ========================================================================== */
+.btn-header-install {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--accent);
+  color: var(--text-dark);
+  font-weight: 800;
+  border-radius: var(--radius-btn);
+  height: 44px;
+  padding: 0 14px;
+  flex-shrink: 0;
+}
+
+.btn-header-install:hover {
+  background-color: var(--accent);
+  filter: brightness(1.08);
+}
+
+.install-banner {
+  background: var(--surface);
+  color: var(--text-dark);
+  border: var(--border-width) solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-card);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.install-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.install-banner-badge {
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-btn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-dark);
+}
+
+.install-banner-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.install-banner-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--text-dark);
+  line-height: 1.2;
+}
+
+.install-banner-desc {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
    RESPONSIVE DESIGN (320px to 1440px)
    ========================================================================== */
 @media (max-width: 640px) {
@@ -1616,6 +1722,23 @@ input:checked + .slider::before {
   }
   .brand-tagline {
     font-size: 0.65rem;
+  }
+  .btn-header-install {
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    justify-content: center;
+  }
+  .btn-header-install .btn-install-text {
+    display: none;
+  }
+  .install-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .install-banner .btn {
+    width: 100%;
   }
   .stats-strip {
     grid-template-columns: 1fr;
@@ -1638,6 +1761,20 @@ input:checked + .slider::before {
     grid-template-columns: 1fr;
     gap: 10px;
   }
+  .results-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .results-actions .btn {
+    width: 100%;
+    font-size: 1.05rem;
+    padding: 14px 16px;
+  }
+  .btn-lg {
+    font-size: 1.05rem;
+    padding: 13px 20px;
+  }
   .meta-banner {
     grid-template-columns: 1fr 1fr;
   }
@@ -1645,3 +1782,4 @@ input:checked + .slider::before {
     grid-column: span 2;
   }
 }
+

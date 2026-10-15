@@ -42,6 +42,7 @@
       this.bindSettingsEvents();
       this.bindModals();
       this.bindKeyboardShortcuts();
+      this.bindPWAInstall();
 
       this.refreshHomeStats();
       this.navigateTo('screen-home');
@@ -579,7 +580,7 @@
       }
 
       if (btnAgain) {
-        btnAgain.textContent = 'RESTART RUN ↺';
+        btnAgain.textContent = (res.isGameOver || res.incorrectCount > 0) ? 'RESTART RUN ↻' : 'PLAY AGAIN ↻';
       }
 
       document.getElementById('results-score-value').textContent = res.score;
@@ -592,7 +593,17 @@
 
       const mistakeCountBadge = document.getElementById('results-mistake-count');
       if (mistakeCountBadge) {
-        mistakeCountBadge.textContent = res.mistakes.length;
+        mistakeCountBadge.textContent = res.mistakes ? res.mistakes.length : 0;
+      }
+
+      const btnMistakes = document.getElementById('btn-results-mistakes');
+      const resultsActions = document.querySelector('.results-actions');
+      if (btnMistakes) {
+        const hasMistakes = res.mistakes && res.mistakes.length > 0;
+        btnMistakes.style.display = hasMistakes ? 'inline-flex' : 'none';
+        if (resultsActions) {
+          resultsActions.classList.toggle('no-mistakes', !hasMistakes);
+        }
       }
     }
 
@@ -1158,6 +1169,134 @@
       };
       document.getElementById('btn-rules-back')?.addEventListener('click', navHome);
       document.getElementById('link-footer-rules')?.addEventListener('click', navRules);
+    }
+
+    // =========================================================================
+    // PWA INSTALLATION CONTROLLER
+    // =========================================================================
+    bindPWAInstall() {
+      const headerInstallBtn = document.getElementById('btn-header-install');
+      const homeInstallBanner = document.getElementById('home-install-banner');
+      const homeInstallBtn = document.getElementById('btn-home-install');
+      const settingsInstallBtn = document.getElementById('btn-settings-install');
+      const pwaStatusInstalled = document.getElementById('pwa-status-installed');
+      const installModal = document.getElementById('modal-install-guide');
+      const modalInstallContent = document.getElementById('modal-install-content');
+      const btnModalClose = document.getElementById('btn-modal-install-close');
+      const btnModalDone = document.getElementById('btn-modal-install-done');
+
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.navigator.standalone === true || 
+                           document.referrer.includes('android-app://');
+
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+      const updateUIState = (canPrompt = false) => {
+        if (isStandalone) {
+          if (headerInstallBtn) headerInstallBtn.style.display = 'none';
+          if (homeInstallBanner) homeInstallBanner.style.display = 'none';
+          if (settingsInstallBtn) settingsInstallBtn.style.display = 'none';
+          if (pwaStatusInstalled) pwaStatusInstalled.style.display = 'inline-flex';
+          return;
+        }
+
+        if (pwaStatusInstalled) pwaStatusInstalled.style.display = 'none';
+
+        if (canPrompt || isIOS) {
+          if (headerInstallBtn) headerInstallBtn.style.display = 'inline-flex';
+          if (homeInstallBanner) homeInstallBanner.style.display = 'flex';
+          if (settingsInstallBtn) settingsInstallBtn.style.display = 'inline-flex';
+        }
+      };
+
+      const openInstallGuide = () => {
+        if (!installModal || !modalInstallContent) return;
+        if (isIOS) {
+          modalInstallContent.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 14px; font-weight: 700;">
+              <p style="font-size: 1rem; color: var(--text-dark);">
+                To install <strong>MindSprint</strong> on your iPhone or iPad:
+              </p>
+              <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 0.95rem; color: var(--text-dark);">
+                <li>Tap the <strong>Share</strong> button <span style="font-size: 1.2rem;">⎋</span> at the bottom of Safari.</li>
+                <li>Scroll down and tap <strong>"Add to Home Screen"</strong> <span style="background: var(--surface-dark); color: #fff; padding: 1px 6px; border-radius: 4px;">[+]</span>.</li>
+                <li>Tap <strong>Add</strong> in the top-right corner.</li>
+              </ol>
+              <div style="background: var(--surface-muted); padding: 10px 14px; border-radius: var(--radius-btn); border: 2px solid var(--border-color); font-size: 0.85rem; color: #333;">
+                ⚡ MindSprint will launch in fullscreen with instant offline loading!
+              </div>
+            </div>
+          `;
+        } else {
+          modalInstallContent.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 14px; font-weight: 700;">
+              <p style="font-size: 1rem; color: var(--text-dark);">
+                To install <strong>MindSprint</strong> on your browser or device:
+              </p>
+              <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 0.95rem; color: var(--text-dark);">
+                <li>Look for the <strong>Install App</strong> icon on the right side of your address bar.</li>
+                <li>Or open your browser menu <span style="background: var(--surface-dark); color: #fff; padding: 1px 6px; border-radius: 4px;">⋮</span> and select <strong>"Install MindSprint"</strong>.</li>
+              </ol>
+              <div style="background: var(--surface-muted); padding: 10px 14px; border-radius: var(--radius-btn); border: 2px solid var(--border-color); font-size: 0.85rem; color: #333;">
+                ⚡ Installs instantly to your desktop or home screen for offline practice.
+              </div>
+            </div>
+          `;
+        }
+        installModal.classList.add('active');
+      };
+
+      const triggerInstallPrompt = async () => {
+        if (this.sound) this.sound.playClick();
+        if (window.deferredInstallPrompt) {
+          try {
+            window.deferredInstallPrompt.prompt();
+            const choiceResult = await window.deferredInstallPrompt.userChoice;
+            if (choiceResult && choiceResult.outcome === 'accepted') {
+              console.log('[MindSprint PWA] User accepted installation prompt');
+              if (headerInstallBtn) headerInstallBtn.style.display = 'none';
+              if (homeInstallBanner) homeInstallBanner.style.display = 'none';
+              if (settingsInstallBtn) settingsInstallBtn.style.display = 'none';
+            }
+          } catch (e) {
+            console.warn('[MindSprint PWA] Install prompt error:', e);
+            openInstallGuide();
+          } finally {
+            window.deferredInstallPrompt = null;
+          }
+        } else {
+          openInstallGuide();
+        }
+      };
+
+      headerInstallBtn?.addEventListener('click', triggerInstallPrompt);
+      homeInstallBtn?.addEventListener('click', triggerInstallPrompt);
+      settingsInstallBtn?.addEventListener('click', triggerInstallPrompt);
+
+      const closeGuide = () => installModal?.classList.remove('active');
+      btnModalClose?.addEventListener('click', closeGuide);
+      btnModalDone?.addEventListener('click', closeGuide);
+
+      window.addEventListener('pwa-prompt-ready', () => {
+        updateUIState(true);
+      });
+
+      if (window.deferredInstallPrompt) {
+        updateUIState(true);
+      } else if (isIOS && !isStandalone) {
+        updateUIState(true);
+      } else {
+        updateUIState(false);
+      }
+
+      window.addEventListener('appinstalled', () => {
+        console.log('[MindSprint PWA] App was successfully installed');
+        window.deferredInstallPrompt = null;
+        if (headerInstallBtn) headerInstallBtn.style.display = 'none';
+        if (homeInstallBanner) homeInstallBanner.style.display = 'none';
+        if (settingsInstallBtn) settingsInstallBtn.style.display = 'none';
+        if (pwaStatusInstalled) pwaStatusInstalled.style.display = 'inline-flex';
+      });
     }
   }
 
