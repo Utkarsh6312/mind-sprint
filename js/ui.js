@@ -403,14 +403,20 @@
       const puzzleContainer = document.getElementById('game-puzzle-container');
 
       if (q.isPuzzle && q.puzzleData) {
-        if (exprText) exprText.textContent = q.expression || 'What comes next? Find the missing result:';
+        if (exprText) {
+          exprText.textContent = q.expression || 'Find the missing number:';
+          exprText.style.fontSize = 'clamp(1.2rem, 3.5vw, 1.8rem)';
+        }
         if (puzzleContainer) {
           puzzleContainer.style.display = 'flex';
           puzzleContainer.style.flexDirection = 'column';
           this.renderPuzzleGrid(puzzleContainer, q.puzzleData);
         }
       } else {
-        if (exprText) exprText.textContent = q.expression;
+        if (exprText) {
+          exprText.textContent = q.expression;
+          exprText.style.fontSize = '';
+        }
         if (puzzleContainer) {
           puzzleContainer.style.display = 'none';
           puzzleContainer.innerHTML = '';
@@ -457,136 +463,50 @@
 
     renderPuzzleGrid(container, puzzleData) {
       container.innerHTML = '';
+      container.className = 'puzzle-grid-container';
 
-      // ── New 4-row pattern puzzle ──────────────────────────────────────────
-      // Rows 1-3: complete examples   e.g.  3 × 4 = 12
-      // Row  4:   missing answer      e.g.  5 × 6 = ?
-      // ─────────────────────────────────────────────────────────────────────
-      if (puzzleData.type === 'rows_4') {
-        container.style.flexDirection = 'column';
-        container.style.gap = '10px';
-        container.style.alignItems = 'stretch';
-        container.style.maxWidth = '380px';
-        container.style.margin = '0 auto';
+      // 4 rows: 3 examples + 1 question mark row
+      // Each row has: [ Box 1 ] [ Box 2 ] ➔ [ Ans Box ]
+      // ZERO arithmetic operators between Box 1 and Box 2
+      const rows = puzzleData.rows || [];
 
-        puzzleData.rows.forEach((row, idx) => {
-          const isQuestion = idx === 3;
-          const rowEl = document.createElement('div');
-          rowEl.className = 'puzzle-row puzzle-row-4';
-          rowEl.style.cssText = `
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border: 3px solid #050505;
-            border-radius: 8px;
-            background: ${isQuestion ? 'var(--accent-yellow,#FFE66D)' : 'var(--surface,#F4F0E8)'};
-            box-shadow: 4px 4px 0 #050505;
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #111;
-          `;
+      rows.forEach((row, idx) => {
+        const isTargetRow = idx === 3 || row.c === '?';
+        const rowEl = document.createElement('div');
+        rowEl.className = 'puzzle-box-row';
 
-          const makeSpan = (text, highlight = false) => {
-            const s = document.createElement('span');
-            s.textContent = text;
-            if (highlight) {
-              // The ? result cell
-              s.style.cssText = `
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                min-width: 42px;
-                height: 42px;
-                border: 3px solid #050505;
-                border-radius: 6px;
-                background: #fff;
-                font-size: 1.5rem;
-                font-weight: 900;
-                box-shadow: 3px 3px 0 #050505;
-                padding: 0 6px;
-              `;
-            }
-            return s;
-          };
+        // Box 1
+        const cellA = document.createElement('div');
+        cellA.className = 'puzzle-cell';
+        cellA.textContent = row.a;
 
-          if (row.label) {
-            // compound expression like "(3+5)×2"
-            rowEl.appendChild(makeSpan(row.label));
-            rowEl.appendChild(makeSpan('='));
-            const resultVal = isQuestion ? '?' : String(row.c);
-            rowEl.appendChild(makeSpan(resultVal, isQuestion));
-          } else {
-            // standard  a  op  b  =  c
-            rowEl.appendChild(makeSpan(String(row.a)));
-            rowEl.appendChild(makeSpan(row.op));
-            if (row.b !== null && row.b !== undefined) {
-              rowEl.appendChild(makeSpan(String(row.b)));
-            }
-            rowEl.appendChild(makeSpan('='));
-            const resultVal = isQuestion ? '?' : String(row.c);
-            rowEl.appendChild(makeSpan(resultVal, isQuestion));
-          }
+        // Box 2 (No operator between Box 1 and Box 2)
+        const cellB = document.createElement('div');
+        cellB.className = 'puzzle-cell';
+        cellB.textContent = row.b;
 
-          // Row number badge (1-3 = example, 4 = question)
-          const badge = document.createElement('span');
-          badge.style.cssText = `
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: #666;
-            margin-left: 6px;
-            opacity: 0.7;
-          `;
-          badge.textContent = isQuestion ? '→ ?' : `#${idx + 1}`;
-          rowEl.appendChild(badge);
+        // Arrow indicating progression to answer
+        const arrow = document.createElement('div');
+        arrow.className = 'puzzle-arrow';
+        arrow.textContent = '➔';
 
-          container.appendChild(rowEl);
-        });
-        return;
-      }
+        // Answer Box (Yellow ? on row 4, beige on rows 1-3)
+        const cellAns = document.createElement('div');
+        if (isTargetRow) {
+          cellAns.className = 'puzzle-cell puzzle-target';
+          cellAns.textContent = '?';
+        } else {
+          cellAns.className = 'puzzle-cell puzzle-result';
+          cellAns.textContent = row.c;
+        }
 
-      // ── Legacy 2x2 grid fallback (kept for safety) ────────────────────────
-      const raw = puzzleData.raw || {};
-      const createCell = (val, isTarget = false, isResult = false) => {
-        const c = document.createElement('div');
-        c.className = `puzzle-cell ${isTarget ? 'puzzle-target' : ''} ${isResult ? 'puzzle-result' : ''}`;
-        c.textContent = val;
-        return c;
-      };
-      const createOp = (sym) => {
-        const o = document.createElement('div');
-        o.className = 'puzzle-op';
-        o.textContent = sym;
-        return o;
-      };
-      const r1 = document.createElement('div');
-      r1.className = 'puzzle-row';
-      r1.appendChild(createCell(raw.hidePos === 0 ? '?' : raw.a, raw.hidePos === 0));
-      r1.appendChild(createOp('+'));
-      r1.appendChild(createCell(raw.hidePos === 1 ? '?' : raw.b, raw.hidePos === 1));
-      r1.appendChild(createOp('='));
-      r1.appendChild(createCell(raw.r1, false, true));
-      container.appendChild(r1);
-      const opRow = document.createElement('div');
-      opRow.className = 'puzzle-row';
-      ['+',' ','+',' ',' '].forEach(s => opRow.appendChild(createOp(s)));
-      container.appendChild(opRow);
-      const r2 = document.createElement('div');
-      r2.className = 'puzzle-row';
-      r2.appendChild(createCell(raw.hidePos === 2 ? '?' : raw.c, raw.hidePos === 2));
-      r2.appendChild(createOp('+'));
-      r2.appendChild(createCell(raw.hidePos === 3 ? '?' : raw.d, raw.hidePos === 3));
-      r2.appendChild(createOp('='));
-      r2.appendChild(createCell(raw.r2, false, true));
-      container.appendChild(r2);
-      const botRow = document.createElement('div');
-      botRow.className = 'puzzle-row';
-      [raw.c1, '', raw.c2, '', ''].forEach((v, i) => {
-        if (i % 2 === 0 && v !== '') botRow.appendChild(createCell(v, false, true));
-        else botRow.appendChild(createOp(''));
+        rowEl.appendChild(cellA);
+        rowEl.appendChild(cellB);
+        rowEl.appendChild(arrow);
+        rowEl.appendChild(cellAns);
+
+        container.appendChild(rowEl);
       });
-      container.appendChild(botRow);
     }
 
     renderFeedback(feedback) {

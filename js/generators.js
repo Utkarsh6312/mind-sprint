@@ -590,171 +590,146 @@
   // ==========================================
   // 6. MATH PUZZLES GENERATOR
   // ==========================================
-  // Format: 4-row equation table
-  //   Row 1 (example):  A  op  B  =  C
-  //   Row 2 (example):  D  op  E  =  F
-  //   Row 3 (example):  G  op  H  =  I
-  //   Row 4 (question): J  op  K  =  ?   ← find the result
-  // The operator and number pattern follows a logical rule.
+  // Format: 4 rows of [ Box A ] [ Box B ] ➔ [ Box C ] (without arithmetic operators)
+  //   Row 1 (example 1): [ A1 ] [ B1 ] ➔ [ C1 ]
+  //   Row 2 (example 2): [ A2 ] [ B2 ] ➔ [ C2 ]
+  //   Row 3 (example 3): [ A3 ] [ B3 ] ➔ [ C3 ]
+  //   Row 4 (question):  [ A4 ] [ B4 ] ➔ [  ? ]  ← solve for ?
   // ==========================================
   const MathPuzzles = {
-    // Available puzzle patterns
     _patterns: [
-      // Pattern: A op B = C  where A and B step by fixed increments each row
-      // e.g. multiply: 2×3=6, 3×4=12, 4×5=20, 5×6=?
       {
-        name: 'step_multiply',
-        ops: ['×'],
-        generate(difficulty) {
-          const maxStart = difficulty === 'easy' ? 4 : difficulty === 'expert' ? 9 : 7;
-          const a0 = randInt(2, maxStart);
-          const b0 = randInt(2, maxStart);
-          const da = randInt(1, 2); // step for left column
-          const db = randInt(1, 2); // step for right column
-          const rows = [];
-          for (let i = 0; i < 4; i++) {
-            const a = a0 + i * da;
-            const b = b0 + i * db;
-            rows.push({ a, op: '×', b, c: a * b });
-          }
-          return rows;
+        name: 'product',
+        desc: (a, b) => `Rule: A × B → ${a} × ${b} = ${a * b}`,
+        fn: (a, b) => a * b,
+        genPair(diff) {
+          const maxA = diff === 'easy' ? 5 : (diff === 'expert' ? 12 : 8);
+          const maxB = diff === 'easy' ? 6 : (diff === 'expert' ? 12 : 9);
+          return [randInt(2, maxA), randInt(2, maxB)];
         }
       },
-      // Pattern: result grows by a fixed step each row
-      // e.g. 3+5=8, 4+6=10, 5+7=12, 6+8=?
       {
-        name: 'step_add',
-        ops: ['+'],
-        generate(difficulty) {
-          const maxStart = difficulty === 'easy' ? 8 : difficulty === 'expert' ? 25 : 15;
-          const a0 = randInt(1, maxStart);
-          const b0 = randInt(1, maxStart);
-          const da = randInt(1, 3);
-          const db = randInt(1, 3);
-          const rows = [];
-          for (let i = 0; i < 4; i++) {
-            const a = a0 + i * da;
-            const b = b0 + i * db;
-            rows.push({ a, op: '+', b, c: a + b });
-          }
-          return rows;
+        name: 'product_plus_first',
+        desc: (a, b) => `Rule: (A × B) + A → (${a} × ${b}) + ${a} = ${a * b + a}`,
+        fn: (a, b) => a * b + a,
+        genPair(diff) {
+          const max = diff === 'easy' ? 5 : (diff === 'expert' ? 9 : 7);
+          return [randInt(2, max), randInt(2, max)];
         }
       },
-      // Pattern: subtract stepping values
-      // e.g. 20-3=17, 18-4=14, 16-5=11, 14-6=?
       {
-        name: 'step_subtract',
-        ops: ['-'],
-        generate(difficulty) {
-          const maxStart = difficulty === 'easy' ? 20 : difficulty === 'expert' ? 60 : 40;
-          const minB = 2;
-          const b0 = randInt(minB, minB + 4);
-          const a0 = randInt(b0 + 8, maxStart);
-          const da = -2; // left col decreases
-          const db = 1;  // right col increases
-          const rows = [];
-          for (let i = 0; i < 4; i++) {
-            const a = a0 + i * da;
-            const b = b0 + i * db;
-            if (a - b < 0) break;
-            rows.push({ a, op: '-', b, c: a - b });
-          }
-          if (rows.length < 4) return null; // retry
-          return rows;
+        name: 'product_plus_second',
+        desc: (a, b) => `Rule: (A × B) + B → (${a} × ${b}) + ${b} = ${a * b + b}`,
+        fn: (a, b) => a * b + b,
+        genPair(diff) {
+          const max = diff === 'easy' ? 5 : (diff === 'expert' ? 9 : 7);
+          return [randInt(2, max), randInt(2, max)];
         }
       },
-      // Pattern: A × fixed = C, A steps up
-      // e.g. 3×7=21, 4×7=28, 5×7=35, 6×7=?
       {
-        name: 'fixed_multiplier',
-        ops: ['×'],
-        generate(difficulty) {
-          const maxMul = difficulty === 'easy' ? 6 : difficulty === 'expert' ? 15 : 10;
-          const mul = randInt(3, maxMul);
-          const a0 = randInt(2, 8);
-          const rows = [];
-          for (let i = 0; i < 4; i++) {
-            const a = a0 + i;
-            rows.push({ a, op: '×', b: mul, c: a * mul });
-          }
-          return rows;
+        name: 'sum_doubled',
+        desc: (a, b) => `Rule: (A + B) × 2 → (${a} + ${b}) × 2 = ${(a + b) * 2}`,
+        fn: (a, b) => (a + b) * 2,
+        genPair(diff) {
+          const max = diff === 'easy' ? 6 : (diff === 'expert' ? 14 : 9);
+          return [randInt(1, max), randInt(1, max)];
         }
       },
-      // Pattern: mixed — add left, multiply right gives result pattern
-      // e.g. (2+3)×2=10, (3+3)×2=12, (4+3)×2=14, (5+3)×2=?
       {
-        name: 'add_then_multiply',
-        ops: ['+', '×'],
-        generate(difficulty) {
-          const maxMul = difficulty === 'easy' ? 3 : difficulty === 'expert' ? 7 : 5;
-          const mul = randInt(2, maxMul);
-          const fixed = randInt(2, 6);
-          const a0 = randInt(2, 7);
-          const rows = [];
-          for (let i = 0; i < 4; i++) {
-            const a = a0 + i;
-            const b = fixed;
-            const c = (a + b) * mul;
-            rows.push({ a, op: `+${fixed})×${mul}`, b: null, c, display: `(${a}+${fixed})×${mul}` });
-          }
-          return rows;
+        name: 'sum_tripled',
+        desc: (a, b) => `Rule: (A + B) × 3 → (${a} + ${b}) × 3 = ${(a + b) * 3}`,
+        fn: (a, b) => (a + b) * 3,
+        genPair(diff) {
+          const max = diff === 'easy' ? 5 : (diff === 'expert' ? 10 : 7);
+          return [randInt(1, max), randInt(1, max)];
         }
       },
-      // Pattern: square stepping
-      // e.g. 1²+1=2, 2²+1=5, 3²+1=10, 4²+1=?
       {
-        name: 'squares_plus',
-        ops: ['²+'],
-        generate(difficulty) {
-          const maxBase = difficulty === 'easy' ? 5 : difficulty === 'expert' ? 10 : 7;
-          const add = randInt(1, difficulty === 'easy' ? 3 : 8);
-          const a0 = randInt(1, maxBase - 3);
-          const rows = [];
-          for (let i = 0; i < 4; i++) {
-            const a = a0 + i;
-            rows.push({ a, op: '²+', b: add, c: a * a + add });
-          }
-          return rows;
+        name: 'first_squared_plus_second',
+        desc: (a, b) => `Rule: A² + B → ${a}² + ${b} = ${a * a + b}`,
+        fn: (a, b) => a * a + b,
+        genPair(diff) {
+          const maxA = diff === 'easy' ? 4 : (diff === 'expert' ? 8 : 6);
+          const maxB = diff === 'easy' ? 5 : (diff === 'expert' ? 12 : 8);
+          return [randInt(2, maxA), randInt(1, maxB)];
+        }
+      },
+      {
+        name: 'sum_of_squares',
+        desc: (a, b) => `Rule: A² + B² → ${a}² + ${b}² = ${a * a + b * b}`,
+        fn: (a, b) => a * a + b * b,
+        genPair(diff) {
+          const max = diff === 'easy' ? 3 : (diff === 'expert' ? 6 : 5);
+          return [randInt(1, max), randInt(1, max)];
+        }
+      },
+      {
+        name: 'diff_scaled',
+        desc: (a, b) => `Rule: (A − B) × 4 → (${a} − ${b}) × 4 = ${(a - b) * 4}`,
+        fn: (a, b) => (a - b) * 4,
+        genPair(diff) {
+          const b = randInt(1, diff === 'easy' ? 4 : 7);
+          const diffVal = randInt(2, diff === 'easy' ? 4 : 6);
+          return [b + diffVal, b];
+        }
+      },
+      {
+        name: 'two_a_plus_three_b',
+        desc: (a, b) => `Rule: (2 × A) + (3 × B) → (2 × ${a}) + (3 × ${b}) = ${2 * a + 3 * b}`,
+        fn: (a, b) => 2 * a + 3 * b,
+        genPair(diff) {
+          const max = diff === 'easy' ? 4 : (diff === 'expert' ? 8 : 6);
+          return [randInt(1, max), randInt(1, max)];
         }
       }
     ],
 
     generate(difficulty = 'medium') {
-      // Pick a random pattern, retry if it returns null
-      let rows = null;
-      let pattern = null;
-      let attempts = 0;
-      while ((!rows || rows.length < 4) && attempts < 20) {
-        attempts++;
-        pattern = this._patterns[randInt(0, this._patterns.length - 1)];
-        rows = pattern.generate(difficulty);
-      }
-      if (!rows || rows.length < 4) {
-        // Fallback: simple step add
-        rows = [];
-        for (let i = 0; i < 4; i++) {
-          const a = 3 + i * 2;
-          const b = 5 + i * 2;
-          rows.push({ a, op: '+', b, c: a + b });
+      const pattern = pickRandom(this._patterns);
+
+      // Generate 4 unique pairs of inputs
+      const pairs = [];
+      const seen = new Set();
+      let tries = 0;
+      while (pairs.length < 4 && tries < 100) {
+        tries++;
+        const p = pattern.genPair(difficulty);
+        const key = `${p[0]},${p[1]}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          pairs.push(p);
         }
       }
+      // Fallback if needed
+      while (pairs.length < 4) {
+        pairs.push([pairs.length + 2, pairs.length + 3]);
+      }
 
-      const targetAnswer = rows[3].c;
+      // Compute rows
+      const rawRows = pairs.map(([a, b]) => ({
+        a,
+        b,
+        c: pattern.fn(a, b)
+      }));
+
+      const targetAnswer = rawRows[3].c;
       const choices = generateDistractors(targetAnswer, 3, { min: 0 });
 
-      // Build display rows — first 3 are shown, 4th has ? for answer
-      const displayRows = rows.map((r, i) => {
-        if (r.display) {
-          // compound display (e.g. add_then_multiply)
-          return { label: r.display, c: i === 3 ? '?' : r.c };
-        }
-        return { a: r.a, op: r.op, b: r.b, c: i === 3 ? '?' : r.c };
-      });
+      // Display rows: first 3 show answer, 4th shows '?'
+      const displayRows = rawRows.map((r, idx) => ({
+        a: r.a,
+        b: r.b,
+        c: idx === 3 ? '?' : r.c
+      }));
 
       const puzzleData = {
         type: 'rows_4',
         rows: displayRows,
-        raw: { rows, pattern: pattern.name, answer: targetAnswer }
+        raw: {
+          rows: rawRows,
+          pattern: pattern.name,
+          answer: targetAnswer
+        }
       };
 
       return {
@@ -763,11 +738,11 @@
         isPuzzle: true,
         puzzleType: 'rows_4',
         puzzleData,
-        expression: 'What comes next? Find the missing result:',
+        expression: 'Find the pattern and solve for ?:',
         correctAnswer: targetAnswer,
         correctAnswerDisplay: String(targetAnswer),
         choices: choices.map((ch) => ({ value: ch, display: String(ch) })),
-        explanation: `Pattern: ${pattern.name.replace(/_/g, ' ')} → answer is ${targetAnswer}`
+        explanation: pattern.desc(rawRows[3].a, rawRows[3].b)
       };
     }
   };

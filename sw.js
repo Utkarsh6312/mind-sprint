@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mindsprint-v1.0.0';
+const CACHE_NAME = 'mindsprint-v1.1.0';
 
 // Relative assets to cache
 const STATIC_ASSETS = [

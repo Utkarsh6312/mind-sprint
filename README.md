@@ -51,7 +51,7 @@ mindsprint/
 | **Sequences** | Pattern completion — arithmetic, geometric, squares, Fibonacci-style, and more |
 | **Compare** | Compare two expressions using `>`, `=`, `<` |
 | **Squares** | Mental squares and cubes with difficulty-scaled base numbers |
-| **Math Puzzles** | 2×2 grid matrix — solve for the missing cell using row & column equations |
+| **Math Puzzles** | Number pattern reasoning — deduce the hidden rule from 3 example rows to solve for `?` |
 | **Mixed Sprint** | Cycles through all modes for a balanced mental workout |
 
 ---

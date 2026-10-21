@@ -252,11 +252,13 @@
               }
             },
             {
-              desc: 'Math Puzzles generates verified 2x2 grid matrix',
+              desc: 'Math Puzzles generates verified 4-row pattern equations',
               fn: () => {
                 const q = G.MathPuzzles.generate('medium');
                 assert(q.isPuzzle);
-                assertEqual(q.puzzleData.raw.a + q.puzzleData.raw.b, q.puzzleData.raw.r1);
+                assertEqual(q.puzzleData.raw.rows.length, 4);
+                assertEqual(q.puzzleData.raw.rows[3].c, q.correctAnswer);
+                assertEqual(q.choices.length, 4);
               }
             }
           ]
