@@ -403,9 +403,10 @@
       const puzzleContainer = document.getElementById('game-puzzle-container');
 
       if (q.isPuzzle && q.puzzleData) {
-        if (exprText) exprText.textContent = 'Find the missing number in the grid:';
+        if (exprText) exprText.textContent = q.expression || 'What comes next? Find the missing result:';
         if (puzzleContainer) {
           puzzleContainer.style.display = 'flex';
+          puzzleContainer.style.flexDirection = 'column';
           this.renderPuzzleGrid(puzzleContainer, q.puzzleData);
         }
       } else {
@@ -456,30 +457,109 @@
 
     renderPuzzleGrid(container, puzzleData) {
       container.innerHTML = '';
-      const raw = puzzleData.raw;
 
-      // 2x2 Matrix with row & column operations
-      // Row 1: [A] + [B] = R1
-      // Op Row:  +     +
-      // Row 2: [C] + [D] = R2
-      // Eq Row:  =     =
-      // Col Res: C1    C2
+      // ── New 4-row pattern puzzle ──────────────────────────────────────────
+      // Rows 1-3: complete examples   e.g.  3 × 4 = 12
+      // Row  4:   missing answer      e.g.  5 × 6 = ?
+      // ─────────────────────────────────────────────────────────────────────
+      if (puzzleData.type === 'rows_4') {
+        container.style.flexDirection = 'column';
+        container.style.gap = '10px';
+        container.style.alignItems = 'stretch';
+        container.style.maxWidth = '380px';
+        container.style.margin = '0 auto';
 
+        puzzleData.rows.forEach((row, idx) => {
+          const isQuestion = idx === 3;
+          const rowEl = document.createElement('div');
+          rowEl.className = 'puzzle-row puzzle-row-4';
+          rowEl.style.cssText = `
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 3px solid #050505;
+            border-radius: 8px;
+            background: ${isQuestion ? 'var(--accent-yellow,#FFE66D)' : 'var(--surface,#F4F0E8)'};
+            box-shadow: 4px 4px 0 #050505;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #111;
+          `;
+
+          const makeSpan = (text, highlight = false) => {
+            const s = document.createElement('span');
+            s.textContent = text;
+            if (highlight) {
+              // The ? result cell
+              s.style.cssText = `
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 42px;
+                height: 42px;
+                border: 3px solid #050505;
+                border-radius: 6px;
+                background: #fff;
+                font-size: 1.5rem;
+                font-weight: 900;
+                box-shadow: 3px 3px 0 #050505;
+                padding: 0 6px;
+              `;
+            }
+            return s;
+          };
+
+          if (row.label) {
+            // compound expression like "(3+5)×2"
+            rowEl.appendChild(makeSpan(row.label));
+            rowEl.appendChild(makeSpan('='));
+            const resultVal = isQuestion ? '?' : String(row.c);
+            rowEl.appendChild(makeSpan(resultVal, isQuestion));
+          } else {
+            // standard  a  op  b  =  c
+            rowEl.appendChild(makeSpan(String(row.a)));
+            rowEl.appendChild(makeSpan(row.op));
+            if (row.b !== null && row.b !== undefined) {
+              rowEl.appendChild(makeSpan(String(row.b)));
+            }
+            rowEl.appendChild(makeSpan('='));
+            const resultVal = isQuestion ? '?' : String(row.c);
+            rowEl.appendChild(makeSpan(resultVal, isQuestion));
+          }
+
+          // Row number badge (1-3 = example, 4 = question)
+          const badge = document.createElement('span');
+          badge.style.cssText = `
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #666;
+            margin-left: 6px;
+            opacity: 0.7;
+          `;
+          badge.textContent = isQuestion ? '→ ?' : `#${idx + 1}`;
+          rowEl.appendChild(badge);
+
+          container.appendChild(rowEl);
+        });
+        return;
+      }
+
+      // ── Legacy 2x2 grid fallback (kept for safety) ────────────────────────
+      const raw = puzzleData.raw || {};
       const createCell = (val, isTarget = false, isResult = false) => {
         const c = document.createElement('div');
         c.className = `puzzle-cell ${isTarget ? 'puzzle-target' : ''} ${isResult ? 'puzzle-result' : ''}`;
         c.textContent = val;
         return c;
       };
-
       const createOp = (sym) => {
         const o = document.createElement('div');
         o.className = 'puzzle-op';
         o.textContent = sym;
         return o;
       };
-
-      // Row 1
       const r1 = document.createElement('div');
       r1.className = 'puzzle-row';
       r1.appendChild(createCell(raw.hidePos === 0 ? '?' : raw.a, raw.hidePos === 0));
@@ -488,18 +568,10 @@
       r1.appendChild(createOp('='));
       r1.appendChild(createCell(raw.r1, false, true));
       container.appendChild(r1);
-
-      // Vertical Ops
       const opRow = document.createElement('div');
       opRow.className = 'puzzle-row';
-      opRow.appendChild(createOp('+'));
-      opRow.appendChild(createOp(''));
-      opRow.appendChild(createOp('+'));
-      opRow.appendChild(createOp(''));
-      opRow.appendChild(createOp(''));
+      ['+',' ','+',' ',' '].forEach(s => opRow.appendChild(createOp(s)));
       container.appendChild(opRow);
-
-      // Row 2
       const r2 = document.createElement('div');
       r2.className = 'puzzle-row';
       r2.appendChild(createCell(raw.hidePos === 2 ? '?' : raw.c, raw.hidePos === 2));
@@ -508,15 +580,12 @@
       r2.appendChild(createOp('='));
       r2.appendChild(createCell(raw.r2, false, true));
       container.appendChild(r2);
-
-      // Bottom Column Totals
       const botRow = document.createElement('div');
       botRow.className = 'puzzle-row';
-      botRow.appendChild(createCell(raw.c1, false, true));
-      botRow.appendChild(createOp(''));
-      botRow.appendChild(createCell(raw.c2, false, true));
-      botRow.appendChild(createOp(''));
-      botRow.appendChild(createOp(''));
+      [raw.c1, '', raw.c2, '', ''].forEach((v, i) => {
+        if (i % 2 === 0 && v !== '') botRow.appendChild(createCell(v, false, true));
+        else botRow.appendChild(createOp(''));
+      });
       container.appendChild(botRow);
     }
 

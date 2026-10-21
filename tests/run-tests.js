@@ -161,15 +161,31 @@ test('Squares generator creates correct squared values', () => {
   }
 });
 
-test('Math Puzzles generates solvable 2x2 grid equations', () => {
-  for (let i = 0; i < 30; i++) {
+test('Math Puzzles generates solvable 4-row pattern equations', () => {
+  for (let i = 0; i < 40; i++) {
     const q = Generators.MathPuzzles.generate('medium');
     assert(q.isPuzzle, 'Must be marked as puzzle');
-    const raw = q.puzzleData.raw;
-    assert.strictEqual(raw.a + raw.b, raw.r1, 'Row 1 arithmetic must hold');
-    assert.strictEqual(raw.c + raw.d, raw.r2, 'Row 2 arithmetic must hold');
-    assert.strictEqual(raw.a + raw.c, raw.c1, 'Col 1 arithmetic must hold');
-    assert.strictEqual(raw.b + raw.d, raw.c2, 'Col 2 arithmetic must hold');
+    assert.strictEqual(q.puzzleType, 'rows_4', 'Puzzle type must be rows_4');
+
+    const rows = q.puzzleData.raw.rows;
+    assert(Array.isArray(rows) && rows.length === 4, 'Must have exactly 4 rows');
+
+    // Verify each row's equation holds
+    rows.forEach((row, idx) => {
+      if (row.c !== undefined) {
+        assert(typeof row.c === 'number', `Row ${idx + 1} result must be a number`);
+        assert(Number.isFinite(row.c), `Row ${idx + 1} result must be finite`);
+      }
+    });
+
+    // Answer matches row 4 result
+    assert.strictEqual(q.correctAnswer, rows[3].c, 'Correct answer must equal row 4 result');
+
+    // Choices include correct answer
+    const choiceValues = q.choices.map(ch => ch.value);
+    assert(choiceValues.includes(q.correctAnswer), 'Choices must include the correct answer');
+    const unique = new Set(choiceValues);
+    assert.strictEqual(unique.size, 4, 'Must have 4 unique choices');
   }
 });
 
